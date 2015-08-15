@@ -8,6 +8,7 @@ import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.entity.InputStreamEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
+import ytuploader.youtube.exceptions.UploadException;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -20,7 +21,7 @@ public class SimpleHTTP {
     this.chc = HttpClients.createDefault();
   }
 
-  public String post(String url, Map<String, String> headers, String body) throws IOException {
+  public String post(String url, Map<String, String> headers, String body) throws IOException, UploadException {
     HttpPost post = new HttpPost(url);
 
     for (String key : headers.keySet()) {
@@ -36,6 +37,11 @@ public class SimpleHTTP {
         location = h.getValue();
       }
     }
+
+    if (location == null) {
+      throw UploadException.construct(response.getEntity().getContent());
+    }
+
 
     response.close();
     return location;

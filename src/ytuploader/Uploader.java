@@ -3,20 +3,27 @@ package ytuploader;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import ytuploader.json.OAuth;
+import ytuploader.json.Presets;
 import ytuploader.json.Settings;
 import ytuploader.oauth.OAuth2;
 import ytuploader.ui.DefaultUploadEvent;
+import ytuploader.util.RegularExpression;
 import ytuploader.youtube.YouTube;
 import ytuploader.youtube.data.Upload;
+import ytuploader.youtube.data.Video;
+import ytuploader.youtube.exceptions.UploadException;
 import ytuploader.youtube.io.UploadEvent;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Uploader {
   public static final String FILE_SETTINGS = "settings.json";
   public static final String FILE_OAUTH = "oauth.json";
+  public static final String FILE_PRESETS = "presets.json";
   public static final String FILE_UPLOAD = "upload.json";
 
   public static void main(String[] args) throws IOException, InterruptedException {
@@ -74,27 +81,62 @@ public class Uploader {
           fu.delete();
         }
 
-        for (File f : new File(settings.getPath()).listFiles()) {
+        for (File file : new File(settings.getPath()).listFiles()) {
           if (
-            f.isFile()
-              && f.getName().lastIndexOf(".") != -1
-              && settings.contains(f.getName().substring(f.getName().lastIndexOf(".") + 1))
-              && f.lastModified() < System.currentTimeMillis() - 120000
+            file.isFile()
+              && file.getName().lastIndexOf(".") != -1
+              && settings.contains(file.getName().substring(file.getName().lastIndexOf(".") + 1))
+              && file.lastModified() < System.currentTimeMillis() - 120000
             ) {
-            long size = f.length();
+            long size = file.length();
             Thread.sleep(5050);
 
-            if (f.length() == size) {
-              File file = new File(FILE_UPLOAD);
+            if (file.length() == size) {
+              Video video = new Video();
 
-              Upload upload = yt.prepareUpload(f);
-              new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT).writeValue(file, upload);
-              System.out.printf("Uploading %s...", f.getName());
+              Presets presets = new ObjectMapper().readValue(new File(FILE_PRESETS), Presets.class);
+              boolean run = true;
 
-              yt.upload(upload, event, settings.getSpeedLimit());
-              new File("upload.json").delete();
-              f.renameTo(new File(f.getPath() + ".up"));
-              System.out.println(" done");
+              for (int i = 0; i < presets.list.size() && run; i++) {
+                Presets.Preset preset = presets.list.get(i);
+                Matcher matcher = Pattern.compile(preset.pattern).matcher(file.getName());
+
+                if (matcher.find()) {
+                  run = false;
+
+                  if (preset.name != null) {
+                    video.snippet.title = RegularExpression.replaceCallback(preset.name, matcher);
+                  }
+                  if (preset.description != null) {
+                    video.snippet.description = RegularExpression.replaceCallback(preset.description, matcher);
+                  }
+                  if (preset.tags != null) {
+                    video.snippet.tags = preset.tags;
+                  }
+                  if (preset.category != null) {
+                    video.snippet.categoryId = preset.category;
+                  }
+                }
+              }
+
+              try {
+                System.out.printf("Uploading %s...", file.getName());
+                Upload upload = yt.prepareUpload(file, video);
+                new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT).writeValue(new File(FILE_UPLOAD), upload);
+
+                yt.upload(upload, event, settings.getSpeedLimit());
+                new File("upload.json").delete();
+                file.renameTo(new File(file.getPath() + ".up"));
+                System.out.println(" done");
+              }
+              catch (UploadException e) {
+                file.renameTo(new File(file.getPath() + ".er"));
+
+                System.out.println(" upload failed");
+                for (UploadException.Error2 e2 : e.error.errors) {
+                  System.out.println("  -> " + e2.message);
+                }
+              }
             }
           }
         }

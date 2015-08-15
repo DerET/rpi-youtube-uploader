@@ -4,12 +4,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import ytuploader.oauth.OAuth2;
 import ytuploader.youtube.data.Upload;
 import ytuploader.youtube.data.Video;
+import ytuploader.youtube.exceptions.UploadException;
 import ytuploader.youtube.io.SimpleHTTP;
 import ytuploader.youtube.io.UploadEvent;
 import ytuploader.youtube.io.UploadStream;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -21,14 +21,12 @@ public class YouTube {
     this.oAuth2 = oAuth2;
   }
 
-  public Upload prepareUpload(File file) throws IOException {
+  public Upload prepareUpload(File file, Video video) throws IOException, UploadException {
     SimpleHTTP http = new SimpleHTTP();
 
-    String body = new ObjectMapper().writeValueAsString(
-      new Video(
-        file.getName()
-      )
-    );
+    if (video.snippet.title == null) {
+      video.snippet.title = file.getName();
+    }
 
     Map<String, String> headers = new HashMap<>();
     headers.put("Authorization", this.oAuth2.getHeader());
@@ -40,7 +38,7 @@ public class YouTube {
       http.post(
         "https://www.googleapis.com//upload/youtube/v3/videos?uploadType=resumable&part=snippet,status",
         headers,
-        body
+        new ObjectMapper().writeValueAsString(video)
       ),
       file
     );

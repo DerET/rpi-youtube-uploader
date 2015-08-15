@@ -5,10 +5,10 @@ public class Video {
   public final Status status;
 
   public static class Snippet {
-    public final String title;
-    public final String description;
-    public final String[] tags;
-    public final int categoryId;
+    public String title;
+    public String description;
+    public String[] tags;
+    public int categoryId;
 
     public Snippet(String title, String description, String[] tags, int categoryId) {
       this.title = title;
@@ -19,9 +19,9 @@ public class Video {
   }
 
   public static class Status {
-    public final String privacyStatus;
-    public final boolean embeddable;
-    public final String license;
+    public String privacyStatus;
+    public boolean embeddable;
+    public String license;
 
     public Status(String privacyStatus, boolean embeddable, String license) {
       this.privacyStatus = privacyStatus;
@@ -30,10 +30,10 @@ public class Video {
     }
   }
 
-  public Video(String title) {
+  public Video() {
     this.snippet = new Snippet(
-      title,
-      "automatically uploaded",
+      null,
+      "",
       new String[0],
       20
     );
