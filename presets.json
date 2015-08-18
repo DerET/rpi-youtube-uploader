@@ -1,25 +1,26 @@
 {
-  "zelda-(\\d+)": {
-    "name": "Let's Play Zelda #$1 - ",
-    "description": "Test Description",
-    "category": 15
-  },
-
-  "minecraft-(\\d)-(.*?)\\.mkv": {
-    "name": "Let's Play Minecraft $1 - $2",
-    "tags": "f, g, h, i, j, k",
-    "category": 22
-  },
-
-  "minecraft-(\\d+)-(.*?)\\.mkv": {
-    "description": "Minecraft",
-    "tags": "l, m, n, o, p, q"
-  },
-
-  ".": {
-    "name": "Default Title",
+  "list" : [ {
+    "label" : "Zelda",
+    "pattern" : "zelda-(\\d+)",
+    "title" : "Let's Play Zelda #$1 - ",
+    "description" : "Test Description",
+    "category" : 15
+  }, {
+    "label" : "Minecraft 1",
+    "pattern" : "minecraft-(\\d)-(.*?)\\.mkv",
+    "title" : "Let's Play Minecraft $1 - $2",
+    "tags" : "f, g, h, i, j, k",
+    "category" : 22
+  }, {
+    "label" : "Minecraft 2",
+    "pattern" : "minecraft-(\\d+)-(.*?)\\.mkv",
+    "description" : "Minecraft",
+    "tags" : "l, m, n, o, p, q"
+  }, {
+	"label": "Default Preset",
+	"title": "Default Title",
     "description": "Default Description",
     "tags": "Default Tag 1, Default Tag 2, Default Tag 3",
     "category": 20
-  }
+  } ]
 }

@@ -1,10 +1,11 @@
 package ytuploader;
 
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import ytuploader.json.OAuth;
-import ytuploader.json.Presets;
-import ytuploader.json.Settings;
+import data.OAuth;
+import data.Presets;
+import data.Settings;
 import ytuploader.oauth.OAuth2;
 import ytuploader.ui.DefaultUploadEvent;
 import ytuploader.util.RegularExpression;
@@ -26,7 +27,7 @@ public class Uploader {
   public static final String FILE_PRESETS = "presets.json";
   public static final String FILE_UPLOAD = "upload.json";
 
-  public static void main(String[] args) throws IOException, InterruptedException {
+  public Uploader() throws IOException, InterruptedException {
     // Disable commons-logging
     System.setProperty("org.apache.commons.logging.Log", "org.apache.commons.logging.impl.NoOpLog");
 
@@ -92,35 +93,41 @@ public class Uploader {
             Thread.sleep(5050);
 
             if (file.length() == size) {
+              System.out.printf("Uploading %s...", file.getName());
               Video video = new Video();
 
-              Presets presets = new ObjectMapper().readValue(new File(FILE_PRESETS), Presets.class);
-              boolean run = true;
+              if (new File(FILE_PRESETS).exists()) {
+                Presets presets = new ObjectMapper().readValue(new File(FILE_PRESETS), Presets.class);
+                boolean run = true;
 
-              for (int i = 0; i < presets.list.size() && run; i++) {
-                Presets.Preset preset = presets.list.get(i);
-                Matcher matcher = Pattern.compile(preset.pattern).matcher(file.getName());
+                for (int i = 0; i < presets.list.size() && run; i++) {
+                  Presets.Preset preset = presets.list.get(i);
+                  Matcher matcher = Pattern.compile(preset.pattern).matcher(file.getName());
 
-                if (matcher.find()) {
-                  run = false;
+                  if (matcher.find()) {
+                    run = false;
 
-                  if (preset.name != null) {
-                    video.snippet.title = RegularExpression.replaceCallback(preset.name, matcher);
-                  }
-                  if (preset.description != null) {
-                    video.snippet.description = RegularExpression.replaceCallback(preset.description, matcher);
-                  }
-                  if (preset.tags != null) {
-                    video.snippet.tags = preset.tags;
-                  }
-                  if (preset.category != null) {
-                    video.snippet.categoryId = preset.category;
+                    if (preset.title != null) {
+                      video.snippet.title = RegularExpression.replaceCallback(preset.title, matcher);
+                    }
+                    if (preset.description != null) {
+                      video.snippet.description = RegularExpression.replaceCallback(preset.description, matcher);
+                    }
+                    if (preset.tags != null) {
+                      for (int k = 0; k < preset.tags.length; k++) {
+                        preset.tags[k] = RegularExpression.replaceCallback(preset.tags[k], matcher);
+                      }
+
+                      video.snippet.tags = preset.tags;
+                    }
+                    if (preset.category != null) {
+                      video.snippet.categoryId = preset.category;
+                    }
                   }
                 }
               }
 
               try {
-                System.out.printf("Uploading %s...", file.getName());
                 Upload upload = yt.prepareUpload(file, video);
                 new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT).writeValue(new File(FILE_UPLOAD), upload);
 
@@ -140,6 +147,9 @@ public class Uploader {
             }
           }
         }
+      }
+      catch (JsonMappingException e) {
+        System.out.println(" error (" + e.getMessage() + ")");
       }
       catch (IOException e) {
         System.out.println(" aborted (connection error)");

@@ -1,4 +1,4 @@
-package ytuploader.json;
+package data;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
