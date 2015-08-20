@@ -84,7 +84,7 @@ public class MenuBar extends JMenuBar {
                   description,
                   tags
                 ),
-                "match found",
+                "match found using " + preset.label,
                 JOptionPane.INFORMATION_MESSAGE
               );
 

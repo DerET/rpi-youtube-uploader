@@ -17,10 +17,10 @@
     "description" : "Minecraft",
     "tags" : "l, m, n, o, p, q"
   }, {
-    "label": "Default Preset",
-    "title": "Default Title",
-    "description": "Default Description",
-    "tags": "Default Tag 1, Default Tag 2, Default Tag 3",
-    "category": 20
+    "label" : "Default Preset",
+    "title" : "Default Title",
+    "description" : "Default Description",
+    "tags" : "Default Tag 1, Default Tag 2, Default Tag 3",
+    "category" : 20
   } ]
 }

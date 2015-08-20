@@ -16,8 +16,12 @@ public class Presets {
     public String[] tags;
     public Integer category;
 
+    public Preset() {
+      this.category = -1;
+    }
+
     @JsonProperty("tags")
-    public void set(String tags) {
+    public void setTags(String tags) {
       if (tags == null) {
         this.tags = new String[0];
       }
@@ -40,6 +44,16 @@ public class Presets {
       }
 
       return "";
+    }
+
+    @JsonProperty("category")
+    public void setCategory(Integer category) {
+      if (category == null) {
+        this.category = -1;
+      }
+      else {
+        this.category = category;
+      }
     }
 
     @JsonGetter("category")

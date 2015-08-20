@@ -106,6 +106,7 @@ public class Uploader {
 
                   if (matcher.find()) {
                     run = false;
+                    System.out.printf(" Preset %s... ", preset.label);
 
                     if (preset.title != null) {
                       video.snippet.title = RegularExpression.replaceCallback(preset.title, matcher);
