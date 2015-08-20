@@ -5,7 +5,7 @@ import editor.ui.content.PresetSelector;
 
 import javax.swing.*;
 
-public abstract class PresetKeyListener  {
+public abstract class PresetKeyListener {
   private PresetSelector selector;
   private JButton r, s;
 

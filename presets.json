@@ -8,7 +8,7 @@
   }, {
     "label" : "Minecraft 1",
     "pattern" : "minecraft-(\\d)-(.*?)\\.mkv",
-    "title" : "Let's Play Minecraft $1 - $2",
+    "title" : "Let's Play Minecraft #$1 - $2",
     "tags" : "f, g, h, i, j, k",
     "category" : 22
   }, {

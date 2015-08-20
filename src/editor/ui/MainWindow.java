@@ -3,10 +3,10 @@ package editor.ui;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import data.Presets;
 import editor.ui.content.*;
 import editor.ui.content.MenuBar;
 import editor.ui.util.*;
-import data.Presets;
 
 import javax.swing.*;
 import java.awt.*;
@@ -116,7 +116,8 @@ public class MainWindow extends JFrame {
     this.selector.setBackground(this.pfield.getBackground());
     this.add(this.selector, new Constraints().setX(0).setY(0).setHorizontalWeight(1).setRightMargin(6));
 
-    if (this.selector.getSelectedItem() != null) this.rbutton.setPreset((Presets.Preset) this.selector.getSelectedItem());
+    if (this.selector.getSelectedItem() != null)
+      this.rbutton.setPreset((Presets.Preset) this.selector.getSelectedItem());
     this.pfield.addKeyListener(new PresetPatternListener(this.selector, this.rbutton, this.sbutton));
     this.nfield.addKeyListener(new PresetTitleListener(this.selector, this.rbutton, this.sbutton));
     this.darea.addKeyListener(new PresetDescriptionListener(this.selector, this.rbutton, this.sbutton));
